@@ -3,4 +3,12 @@ name = "invoice-gen"
 version = "0.0.1"
 edition = "2024"
 
+authors = ["pengwius <pengwius@protonmail.ch>"]
+description = "SDK for generating invoices in schemas FA (2), FA (3), PEF (3), PEF_KOR (3) and FA_RR (1)"
+license = "MIT"
+categories = ["command-line-utilities", "development-tools"]
+repository = "https://github.com/pengwius/invoice-gen"
+
+keywords = ["invoice", "generator", "SDK", "FA", "PEF"]
+
 [dependencies]
