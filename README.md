@@ -6,7 +6,7 @@ Polska wersja / [English version](README.en.md)
 
 ```rust
 [dependencies]
-invoice-gen = "0.2"
+invoice-gen = "0.0.2"
 ```
 
 ## Użycie
