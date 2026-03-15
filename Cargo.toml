@@ -12,3 +12,8 @@ repository = "https://github.com/pengwius/invoice-gen"
 keywords = ["invoice", "generator", "SDK", "FA", "PEF"]
 
 [dependencies]
+serde = { version = "1.0", features = ["derive"] }
+quick-xml = { version = "0.31", features = ["serialize"] }
+chrono = { version = "0.4", features = ["serde"] }
+rust_decimal = { version = "1.33", features = ["serde"] }
+xmltree = "0.10"
