@@ -1,53 +1,8 @@
 use super::models::*;
+use crate::shared::models::TaxRate;
 use chrono::NaiveDate;
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
-use std::str::FromStr;
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TaxRate {
-    Rate23,
-    Rate8,
-    Rate5,
-    Exempt,
-    Custom(i32),
-}
-
-impl TaxRate {
-    pub fn basis_points(&self) -> i32 {
-        match *self {
-            TaxRate::Rate23 => 2300,
-            TaxRate::Rate8 => 800,
-            TaxRate::Rate5 => 500,
-            TaxRate::Exempt => 0,
-            TaxRate::Custom(n) => n,
-        }
-    }
-
-    pub fn from_str(s: &str) -> Result<TaxRate, ()> {
-        match s {
-            "23" => Ok(TaxRate::Rate23),
-            "8" => Ok(TaxRate::Rate8),
-            "5" => Ok(TaxRate::Rate5),
-            "zw" | "ZW" | "Zw" => Ok(TaxRate::Exempt),
-            other => {
-                if let Ok(d) = Decimal::from_str(other) {
-                    let bp_decimal = (d * Decimal::new(100, 0)).round_dp(0);
-                    if let Some(bp_i32) = bp_decimal.to_i32() {
-                        return Ok(match bp_i32 {
-                            2300 => TaxRate::Rate23,
-                            800 => TaxRate::Rate8,
-                            500 => TaxRate::Rate5,
-                            0 => TaxRate::Exempt,
-                            other => TaxRate::Custom(other),
-                        });
-                    }
-                }
-                Err(())
-            }
-        }
-    }
-}
 
 pub struct SellerBuilder {
     subject: Subject1,
@@ -77,7 +32,7 @@ impl SellerBuilder {
         line = format!("{}, {} {}", line, postal_code, city);
 
         self.subject.address = Address {
-            country_code: country_code.to_string(),
+            country_code: crate::shared::models::CountryCode::new(country_code),
             address_line_1: line,
             address_line_2: None,
             gln: None,
@@ -122,7 +77,7 @@ impl BuyerBuilder {
         line = format!("{}, {} {}", line, postal_code, city);
 
         self.subject.address = Some(Address {
-            country_code: country_code.to_string(),
+            country_code: crate::shared::models::CountryCode::new(country_code),
             address_line_1: line,
             address_line_2: None,
             gln: None,
@@ -147,7 +102,22 @@ impl LineBuilder {
         net_price: Decimal,
         vat_rate: &str,
     ) -> Self {
-        let net_value = (quantity * net_price).round_dp(2);
+        // Normalize unit price to integer cents to avoid rounding issues.
+        // Keep external API using Decimal with two fractional digits, but perform
+        // internal arithmetic on integer cents and reconstruct Decimal values from cents.
+        let unit_price_cents_i128 = (net_price * Decimal::new(100, 0))
+            .round_dp(0)
+            .to_i128()
+            .unwrap_or(0);
+
+        // canonical unit price Decimal with two decimals reconstructed from cents
+        let unit_net_price = Decimal::from_i128_with_scale(unit_price_cents_i128, 2);
+
+        // Compute net value in cents: (unit_price_cents * quantity), round to nearest cent
+        let net_cents_decimal = Decimal::from_i128_with_scale(unit_price_cents_i128, 0) * quantity;
+        let net_cents_i128 = net_cents_decimal.round_dp(0).to_i128().unwrap_or(0);
+        let net_value = Decimal::from_i128_with_scale(net_cents_i128, 2);
+
         let line = InvoiceLine {
             line_number: 0,
             uu_id: None,
@@ -160,9 +130,11 @@ impl LineBuilder {
             pkob_code: None,
             unit: Some(measure_unit.to_string()),
             quantity: Some(quantity),
-            unit_net_price: Some(net_price),
+            // store the canonical two-decimal Decimal reconstructed from integer cents
+            unit_net_price: Some(unit_net_price),
             unit_gross_price: None,
             discount_amount: None,
+            // net_value computed via integer-cent arithmetic then converted back to Decimal with 2 decimals
             net_value: Some(net_value),
             gross_value: None,
             vat_value: None,
@@ -233,8 +205,14 @@ impl InvoiceBuilder {
         let resolved_p_19n =
             exempt_delivery_none.or_else(|| if exempt_delivery == 2 { Some(1) } else { None });
 
+        let opt_exempt = if exempt_delivery == 2 {
+            None
+        } else {
+            Some(exempt_delivery)
+        };
+
         self.invoice.invoice_body.annotations.exemption = TaxExemption {
-            exempt_delivery,
+            exempt_delivery: opt_exempt,
             exempt_delivery_none: resolved_p_19n,
             basis_text: basis_text.map(|s| s.to_string()),
             basis_directive: basis_directive.map(|s| s.to_string()),

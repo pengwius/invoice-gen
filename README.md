@@ -6,10 +6,48 @@ Polska wersja / [English version](README.en.md)
 
 ```rust
 [dependencies]
-invoice-gen = "0.0.2"
+invoice-gen = "0.0.3"
 ```
 
 ## Użycie
+
+### FA (3)
+
+```rust
+use invoice_gen::fa_3::builder::{SellerBuilder, BuyerBuilder, LineBuilder};
+use invoice_gen::fa_3::models::Invoice;
+use rust_decimal::Decimal;
+use std::str::FromStr;
+
+let seller = SellerBuilder::new("5261234567", "Firma Sprzedająca Sp. z o.o.")
+    .set_address("PL", "ul. Przykładowa", "1", None, "Warszawa", "00-001")
+    .build();
+
+let buyer = BuyerBuilder::new("9876543210", "Klient S.A.")
+    .set_address("PL", "ul. Kupiecka", "5", None, "Warszawa", "00-100")
+    .build();
+
+let line = LineBuilder::new(
+    "Produkt",
+    Decimal::new(10, 0),
+    Decimal::from_str("25.00").unwrap(),
+    invoice_gen::shared::models::TaxRate::from_str("23").unwrap(),
+)
+.build();
+
+let mut invoice = Invoice::default();
+invoice.subject1 = seller;
+invoice.subject2 = buyer;
+invoice.invoice_body.invoice_number = "FV/2026/0001".to_string();
+invoice.invoice_body.issue_date = chrono::Local::now().format("%Y-%m-%d").to_string();
+invoice.invoice_body.currency_code = invoice_gen::shared::models::CurrencyCode::new("PLN");
+invoice.invoice_body.lines = vec![line];
+
+let xml = invoice.to_xml().unwrap();
+println!("{}", xml);
+```
+
+### FA (2)
 
 ```rust
 use invoice_gen::fa_2::builder::{SellerBuilder, BuyerBuilder, LineBuilder, InvoiceBuilder};

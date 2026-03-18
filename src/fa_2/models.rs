@@ -134,7 +134,7 @@ pub struct Subject1 {
 
     #[serde(rename = "StatusInfoPodatnika")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub taxpayer_status: Option<u8>,
+    pub taxpayer_status: Option<TStatusInfoPodatnika>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -281,40 +281,9 @@ pub struct Subject3 {
     pub client_number: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default, Clone)]
-#[serde(rename_all = "PascalCase")]
-pub struct IdentificationData {
-    #[serde(rename = "NIP")]
-    pub nip: String,
-    #[serde(rename = "Nazwa")]
-    pub name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default, Clone)]
-#[serde(rename_all = "PascalCase")]
-pub struct ContactData {
-    #[serde(rename = "Email")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-    #[serde(rename = "Telefon")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default, Clone)]
-#[serde(rename_all = "PascalCase")]
-pub struct Address {
-    #[serde(rename = "KodKraju")]
-    pub country_code: String,
-    #[serde(rename = "AdresL1")]
-    pub address_line_1: String,
-    #[serde(rename = "AdresL2")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub address_line_2: Option<String>,
-    #[serde(rename = "GLN")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub gln: Option<String>, // Global Location Number
-}
+pub use crate::shared::models::{
+    Address, ContactData, IdentificationData, TStatusInfoPodatnika, TTypKorekty,
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
@@ -403,7 +372,7 @@ pub struct InvoiceBody {
     pub correction_reason: Option<String>,
     #[serde(rename = "TypKorekty")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub correction_type: Option<u8>,
+    pub correction_type: Option<TTypKorekty>,
 
     #[serde(rename = "FaWiersz")]
     #[serde(default)]
@@ -664,8 +633,8 @@ pub struct BankAccount {
 #[serde(rename_all = "PascalCase")]
 pub struct TaxExemption {
     #[serde(rename = "P_19")]
-    #[serde(default)]
-    pub exempt_delivery: u8,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exempt_delivery: Option<u8>,
     #[serde(rename = "P_19N")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exempt_delivery_none: Option<u8>,
@@ -707,7 +676,7 @@ impl Default for Annotations {
             reverse_charge: 2,
             split_payment: 2,
             exemption: TaxExemption {
-                exempt_delivery: 2,
+                exempt_delivery: None,
                 exempt_delivery_none: Some(1),
                 basis_text: None,
                 basis_directive: None,
