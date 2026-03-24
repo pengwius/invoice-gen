@@ -161,24 +161,76 @@ impl Invoice {
             }
         }
 
-        inv.invoice_body.net_total_basic_rate = if net_13_1 != Decimal::ZERO { Some(net_13_1.round_dp(2)) } else { None };
-        inv.invoice_body.tax_total_basic_rate = if tax_14_1 != Decimal::ZERO { Some(tax_14_1.round_dp(2)) } else { None };
+        inv.invoice_body.net_total_basic_rate = if net_13_1 != Decimal::ZERO {
+            Some(net_13_1.round_dp(2))
+        } else {
+            None
+        };
+        inv.invoice_body.tax_total_basic_rate = if tax_14_1 != Decimal::ZERO {
+            Some(tax_14_1.round_dp(2))
+        } else {
+            None
+        };
 
-        inv.invoice_body.net_total_reduced_rate_1 = if net_13_2 != Decimal::ZERO { Some(net_13_2.round_dp(2)) } else { None };
-        inv.invoice_body.tax_total_reduced_rate_1 = if tax_14_2 != Decimal::ZERO { Some(tax_14_2.round_dp(2)) } else { None };
+        inv.invoice_body.net_total_reduced_rate_1 = if net_13_2 != Decimal::ZERO {
+            Some(net_13_2.round_dp(2))
+        } else {
+            None
+        };
+        inv.invoice_body.tax_total_reduced_rate_1 = if tax_14_2 != Decimal::ZERO {
+            Some(tax_14_2.round_dp(2))
+        } else {
+            None
+        };
 
-        inv.invoice_body.net_total_reduced_rate_2 = if net_13_3 != Decimal::ZERO { Some(net_13_3.round_dp(2)) } else { None };
-        inv.invoice_body.tax_total_reduced_rate_2 = if tax_14_3 != Decimal::ZERO { Some(tax_14_3.round_dp(2)) } else { None };
+        inv.invoice_body.net_total_reduced_rate_2 = if net_13_3 != Decimal::ZERO {
+            Some(net_13_3.round_dp(2))
+        } else {
+            None
+        };
+        inv.invoice_body.tax_total_reduced_rate_2 = if tax_14_3 != Decimal::ZERO {
+            Some(tax_14_3.round_dp(2))
+        } else {
+            None
+        };
 
-        inv.invoice_body.net_total_taxi = if net_13_4 != Decimal::ZERO { Some(net_13_4.round_dp(2)) } else { None };
-        inv.invoice_body.tax_total_taxi = if tax_14_4 != Decimal::ZERO { Some(tax_14_4.round_dp(2)) } else { None };
+        inv.invoice_body.net_total_taxi = if net_13_4 != Decimal::ZERO {
+            Some(net_13_4.round_dp(2))
+        } else {
+            None
+        };
+        inv.invoice_body.tax_total_taxi = if tax_14_4 != Decimal::ZERO {
+            Some(tax_14_4.round_dp(2))
+        } else {
+            None
+        };
 
-        inv.invoice_body.net_total_special = if net_13_5 != Decimal::ZERO { Some(net_13_5.round_dp(2)) } else { None };
-        inv.invoice_body.tax_total_special = if tax_14_5 != Decimal::ZERO { Some(tax_14_5.round_dp(2)) } else { None };
+        inv.invoice_body.net_total_special = if net_13_5 != Decimal::ZERO {
+            Some(net_13_5.round_dp(2))
+        } else {
+            None
+        };
+        inv.invoice_body.tax_total_special = if tax_14_5 != Decimal::ZERO {
+            Some(tax_14_5.round_dp(2))
+        } else {
+            None
+        };
 
-        inv.invoice_body.net_total_0_domestic = if net_13_6_1 != Decimal::ZERO { Some(net_13_6_1.round_dp(2)) } else { None };
-        inv.invoice_body.net_total_0_intra = if net_13_6_2 != Decimal::ZERO { Some(net_13_6_2.round_dp(2)) } else { None };
-        inv.invoice_body.net_total_0_export = if net_13_6_3 != Decimal::ZERO { Some(net_13_6_3.round_dp(2)) } else { None };
+        inv.invoice_body.net_total_0_domestic = if net_13_6_1 != Decimal::ZERO {
+            Some(net_13_6_1.round_dp(2))
+        } else {
+            None
+        };
+        inv.invoice_body.net_total_0_intra = if net_13_6_2 != Decimal::ZERO {
+            Some(net_13_6_2.round_dp(2))
+        } else {
+            None
+        };
+        inv.invoice_body.net_total_0_export = if net_13_6_3 != Decimal::ZERO {
+            Some(net_13_6_3.round_dp(2))
+        } else {
+            None
+        };
 
         inv.invoice_body.total_amount = total.round_dp(2);
 

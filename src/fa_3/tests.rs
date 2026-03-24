@@ -3,8 +3,10 @@
 use rust_decimal::Decimal;
 use std::str::FromStr;
 
+use crate::fa_3::builder::{
+    AuthorizedSubjectBuilder, BuyerBuilder, LineBuilder, SellerBuilder, Subject3Builder,
+};
 use crate::fa_3::models::*;
-use crate::fa_3::builder::{SellerBuilder, BuyerBuilder, Subject3Builder, AuthorizedSubjectBuilder, LineBuilder};
 use crate::shared::models::*;
 
 use std::error::Error;
@@ -85,12 +87,17 @@ fn test_generate_minimal_invoice_and_basic_xml_checks() {
     );
 
     assert!(
-        xml.contains("<P_14_1>57.50</P_14_1>") || xml.contains("<P_14_1>57.5</P_14_1>") || xml.contains("<P_14_1>57.5</P_14_1>") || xml.contains("<P_14_1>57.5</P_14_1>"),
+        xml.contains("<P_14_1>57.50</P_14_1>")
+            || xml.contains("<P_14_1>57.5</P_14_1>")
+            || xml.contains("<P_14_1>57.5</P_14_1>")
+            || xml.contains("<P_14_1>57.5</P_14_1>"),
         "XML does not contain expected P_14_1 value"
     );
 
     assert!(
-        xml.contains("<P_15>307.50</P_15>") || xml.contains("<P_15>307.5</P_15>") || xml.contains("<P_15>307.50</P_15>"),
+        xml.contains("<P_15>307.50</P_15>")
+            || xml.contains("<P_15>307.5</P_15>")
+            || xml.contains("<P_15>307.50</P_15>"),
         "XML does not contain expected P_15 total"
     );
 
@@ -119,17 +126,19 @@ fn test_generate_invoice_with_subject3_and_authorized_and_roles() {
 
     inv.subject1.taxpayer_status = Some(TStatusInfoPodatnika::Restrukturyzacja);
 
-    inv.invoice_body.lines = vec![LineBuilder::new(
-        "Produkt z GTU i procedurą",
-        Decimal::new(2, 0),
-        Decimal::from_str("15.00").unwrap(),
-        TaxRate::from_str("23").unwrap(),
-    )
-    .set_index("IDX-GTU-1")
-    .set_uu_id("uuid-subj3-1")
-    .set_gtu(GTU::Gtu01)
-    .set_procedure(Procedure::BSpv)
-    .build()];
+    inv.invoice_body.lines = vec![
+        LineBuilder::new(
+            "Produkt z GTU i procedurą",
+            Decimal::new(2, 0),
+            Decimal::from_str("15.00").unwrap(),
+            TaxRate::from_str("23").unwrap(),
+        )
+        .set_index("IDX-GTU-1")
+        .set_uu_id("uuid-subj3-1")
+        .set_gtu(GTU::Gtu01)
+        .set_procedure(Procedure::BSpv)
+        .build(),
+    ];
 
     inv.invoice_body.invoice_number = "SUBJ3/2026/0001".to_string();
     inv.invoice_body.currency_code = CurrencyCode::new("EUR");
@@ -186,7 +195,9 @@ fn test_generate_invoice_with_multiple_lines_and_currencies_checks_totals() {
     assert!(xml.contains("<KodWaluty>USD</KodWaluty>") || xml.contains("USD"));
 
     assert!(
-        xml.contains("<P_15>623.00</P_15>") || xml.contains("<P_15>623</P_15>") || xml.contains("<P_15>623.0</P_15>"),
+        xml.contains("<P_15>623.00</P_15>")
+            || xml.contains("<P_15>623</P_15>")
+            || xml.contains("<P_15>623.0</P_15>"),
         "XML does not contain expected P_15 total for multi-line invoice"
     );
 

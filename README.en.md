@@ -178,3 +178,139 @@ println!("{}", xml);
 * antiques: margin procedure - antiques
 
 `build(self)` -> `Result<Invoice, String>`
+
+---
+
+### PEF (UBL)
+
+```rust
+use invoice_gen::pef_3::builder::{
+    InvoiceBuilder, InvoiceLineBuilder, MonetaryTotalBuilder, PartyBuilder,
+    PostalAddressBuilder, TaxTotalBuilder,
+};
+
+let address = PostalAddressBuilder::new()
+    .city_name("Warsaw")
+    .country("PL")
+    .build();
+
+let supplier = PartyBuilder::new()
+    .party_legal_entity("Seller Name Ltd.", None)
+    .postal_address(address.clone())
+    .party_tax_scheme("PL5261234567", "VAT")
+    .build();
+
+let customer = PartyBuilder::new()
+    .party_legal_entity("Buyer Name S.A.", None)
+    .postal_address(address)
+    .build();
+
+let total = MonetaryTotalBuilder::new()
+    .line_extension_amount("PLN", "100.00")
+    .tax_exclusive_amount("PLN", "100.00")
+    .tax_inclusive_amount("PLN", "123.00")
+    .payable_amount("PLN", "123.00")
+    .build();
+
+let tax_total = TaxTotalBuilder::new()
+    .tax_amount("PLN", "23.00")
+    .add_subtotal("100.00", "23.00", "PLN", "S", "23", "VAT")
+    .build();
+
+let line = InvoiceLineBuilder::new("1")
+    .invoiced_quantity("EA", "1.0")
+    .line_extension_amount("PLN", "100.00")
+    .item("Item Name")
+    .price_amount("PLN", "100.00")
+    .tax_category("S", "23", "VAT")
+    .build();
+
+let invoice = InvoiceBuilder::new(
+    "INV-001",
+    "2024-01-01",
+    supplier,
+    customer,
+    total,
+    vec![line],
+)
+.due_date("2024-01-15")
+.add_tax_total(tax_total)
+.build();
+
+let xml = invoice.to_xml().unwrap();
+println!("{}", xml);
+```
+
+---
+
+### PEF Builders
+
+#### InvoiceBuilder (PEF)
+
+`new(id: impl Into<String>, issue_date: impl Into<String>, accounting_supplier_party: PartyType, accounting_customer_party: PartyType, legal_monetary_total: MonetaryTotal, invoice_line: Vec<InvoiceLine>)` -> `InvoiceBuilder`
+
+`due_date(self, date: impl Into<String>)` -> `InvoiceBuilder`
+* date: payment due date
+
+`add_tax_total(self, total: TaxTotal)` -> `InvoiceBuilder`
+* total: tax total (from TaxTotalBuilder)
+
+`build(self)` -> `Invoice`
+
+#### PartyBuilder
+
+`new()` -> `PartyBuilder`
+
+`party_legal_entity(self, registration_name: impl Into<String>, company_id: Option<Identifier>)` -> `PartyBuilder`
+* registration_name: legal name (required for BR-06/BR-07)
+
+`party_name(self, name: impl Into<String>)` -> `PartyBuilder`
+* name: trading name
+
+`postal_address(self, address: PostalAddress)` -> `PartyBuilder`
+* address: address (from PostalAddressBuilder)
+
+`party_tax_scheme(self, company_id: impl Into<String>, tax_scheme_id: impl Into<String>)` -> `PartyBuilder`
+* company_id: tax ID (e.g. NIP)
+* tax_scheme_id: scheme identifier (e.g. VAT)
+
+`build(self)` -> `PartyType`
+
+#### MonetaryTotalBuilder
+
+`new()` -> `MonetaryTotalBuilder`
+
+`line_extension_amount(self, currency: impl Into<String>, value: impl Into<String>)` -> `MonetaryTotalBuilder`
+* Sum of line net amounts
+
+`tax_exclusive_amount(self, currency: impl Into<String>, value: impl Into<String>)` -> `MonetaryTotalBuilder`
+* Invoice net amount
+
+`tax_inclusive_amount(self, currency: impl Into<String>, value: impl Into<String>)` -> `MonetaryTotalBuilder`
+* Invoice gross amount
+
+`payable_amount(self, currency: impl Into<String>, value: impl Into<String>)` -> `MonetaryTotalBuilder`
+* Amount due for payment
+
+`build(self)` -> `MonetaryTotal`
+
+#### InvoiceLineBuilder
+
+`new(id: impl Into<String>)` -> `InvoiceLineBuilder`
+
+`invoiced_quantity(self, unit_code: impl Into<String>, value: impl Into<String>)` -> `InvoiceLineBuilder`
+* Invoiced quantity
+
+`line_extension_amount(self, currency: impl Into<String>, value: impl Into<String>)` -> `InvoiceLineBuilder`
+* Line net amount
+
+`item(self, name: impl Into<String>)` -> `InvoiceLineBuilder`
+* Item name
+
+`price_amount(self, currency: impl Into<String>, value: impl Into<String>)` -> `InvoiceLineBuilder`
+* Net unit price
+
+`tax_category(self, id: impl Into<String>, percent: impl Into<String>, tax_scheme_id: impl Into<String>)` -> `InvoiceLineBuilder`
+* Tax category (e.g. S, 23, VAT)
+
+`build(self)` -> `InvoiceLine`
