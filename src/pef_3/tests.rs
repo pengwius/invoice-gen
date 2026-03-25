@@ -44,7 +44,7 @@ fn test_party_parsing() {
     #[derive(Debug, serde::Deserialize)]
     struct Wrapper {
         #[serde(rename = "cac:Party", alias = "Party")]
-        party: PartyType,
+        _party: PartyType,
     }
 
     let wrapper: Result<Wrapper, _> = quick_xml::de::from_str(xml);

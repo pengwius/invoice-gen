@@ -257,8 +257,8 @@ pub struct Invoice {
 }
 
 impl Invoice {
-    pub fn to_xml(&self) -> Result<String, quick_xml::DeError> {
-        quick_xml::se::to_string(self)
+    pub fn to_xml(&self) -> Result<String, Box<dyn std::error::Error>> {
+        quick_xml::se::to_string(self).map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
     }
 }
 

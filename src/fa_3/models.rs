@@ -69,7 +69,7 @@ impl Default for Invoice {
 }
 
 impl Invoice {
-    pub fn to_xml(&self) -> Result<String, quick_xml::DeError> {
+    pub fn to_xml(&self) -> Result<String, Box<dyn std::error::Error>> {
         let mut inv = self.clone();
 
         use crate::shared::models::TaxRate;
@@ -293,7 +293,7 @@ impl Invoice {
 
         let mut buffer = String::new();
         let serializer = quick_xml::se::Serializer::new(&mut buffer);
-        inv.serialize(serializer)?;
+        inv.serialize(serializer).map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
         let xml_decl = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
         let result = format!("{}{}", xml_decl, buffer);
         Ok(result)
