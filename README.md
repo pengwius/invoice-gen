@@ -6,7 +6,7 @@ Polska wersja / [English version](README.en.md)
 
 ```rust
 [dependencies]
-invoice-gen = "0.0.3"
+invoice-gen = "0.0.5"
 ```
 
 ## Użycie
@@ -71,6 +71,86 @@ let inv = InvoiceBuilder::new()
 let xml = inv.to_xml().unwrap();
 println!("{}", xml);
 ```
+
+---
+
+### FA_RR (Faktura VAT RR – rolnik ryczałtowy)
+
+Obsługa faktur VAT RR zgodnych ze wzorem Ministerstwa Finansów (rolnik ryczałtowy). Pozwala na generowanie faktur RR w formacie XML zgodnym ze schemą XSD.
+
+```rust
+use invoice_gen::fa_rr::builder::{InvoiceRRBuilder, Subject1Builder, Subject2Builder, AddressBuilder, FooterBuilder};
+use invoice_gen::fa_rr::models::Header;
+use rust_decimal::Decimal;
+use chrono::NaiveDate;
+use invoice_gen::shared::models::IdentificationData;
+
+let subject1 = Subject1Builder::new(IdentificationData {
+        nip: "5261234567".to_string(),
+        name: "Rolnik Jan Kowalski".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Wiejska 1")
+            .set_line2("Gospodarstwo 2")
+            .build(),
+    )
+    .build();
+
+let subject2 = Subject2Builder::new(IdentificationData {
+        nip: "9876543210".to_string(),
+        name: "Firma Skupująca Sp. z o.o.".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Przemysłowa 5")
+            .build(),
+    )
+    .build();
+
+let footer = FooterBuilder::new()
+    .set_footer_text("Dziękujemy za współpracę.")
+    .build();
+
+let invoice = InvoiceRRBuilder::new()
+    .set_header(Header::default())
+    .set_subject1(subject1)
+    .set_subject2(subject2)
+    .set_currency("PLN")
+    .set_issue_date(NaiveDate::from_ymd_opt(2023, 10, 25).unwrap())
+    .set_invoice_number("RR/2023/10/001")
+    .set_net_value(Decimal::from_str("1000.00").unwrap())
+    .set_tax_value(Decimal::from_str("65.00").unwrap())
+    .set_total_value(Decimal::from_str("1065.00").unwrap())
+    .set_total_value_pln(Decimal::from_str("1065.00").unwrap())
+    .set_total_value_words("jeden tysiąc sześćdziesiąt pięć złotych 00/100")
+    .set_invoice_type(invoice_gen::fa_rr::models::InvoiceType::VatRr)
+    .set_footer(footer)
+    .build();
+
+let xml = invoice.to_xml().unwrap();
+println!("{}", xml);
+```
+
+#### InvoiceRRBuilder (FA_RR)
+
+- `new()` – utwórz nowy builder faktury RR
+- `set_header(self, header: Header)` – ustaw nagłówek
+- `set_subject1(self, subject1: Subject1)` – ustaw dane rolnika
+- `set_subject2(self, subject2: Subject2)` – ustaw dane nabywcy
+- `set_currency(self, code: &str)` – kod waluty (np. "PLN")
+- `set_issue_date(self, date: NaiveDate)` – data wystawienia
+- `set_invoice_number(self, number: &str)` – numer faktury
+- `set_net_value(self, value: Decimal)` – wartość netto
+- `set_tax_value(self, value: Decimal)` – wartość VAT
+- `set_total_value(self, value: Decimal)` – wartość brutto
+- `set_total_value_pln(self, value: Decimal)` – wartość brutto w PLN (pole P_12_1W)
+- `set_total_value_words(self, value: &str)` – wartość słownie (pole P_12_2)
+- `set_invoice_type(self, typ: InvoiceType)` – typ faktury (VatRr lub KorVatRr)
+- `set_footer(self, footer: Footer)` – stopka (obsługuje strukturę Stopka→Informacje→StopkaFaktury)
+- `build(self)` – zbuduj fakturę
 
 ---
 

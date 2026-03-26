@@ -6,7 +6,7 @@
 
 ```rust
 [dependencies]
-invoice-gen = "0.0.3"
+invoice-gen = "0.0.5"
 ```
 
 ## Usage
@@ -71,6 +71,86 @@ let inv = InvoiceBuilder::new()
 let xml = inv.to_xml().unwrap();
 println!("{}", xml);
 ```
+
+---
+
+### FA_RR (VAT RR Invoice – Flat-rate Farmer)
+
+Support for VAT RR invoices compliant with the Polish Ministry of Finance template (flat-rate farmer). Allows generating RR invoices in XML format according to the official XSD schema.
+
+```rust
+use invoice_gen::fa_rr::builder::{InvoiceRRBuilder, Subject1Builder, Subject2Builder, AddressBuilder, FooterBuilder};
+use invoice_gen::fa_rr::models::Header;
+use rust_decimal::Decimal;
+use chrono::NaiveDate;
+use invoice_gen::shared::models::IdentificationData;
+
+let subject1 = Subject1Builder::new(IdentificationData {
+        nip: "5261234567".to_string(),
+        name: "Jan Kowalski, Farmer".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Wiejska 1")
+            .set_line2("Farm 2")
+            .build(),
+    )
+    .build();
+
+let subject2 = Subject2Builder::new(IdentificationData {
+        nip: "9876543210".to_string(),
+        name: "Purchasing Company Ltd.".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Industrial 5")
+            .build(),
+    )
+    .build();
+
+let footer = FooterBuilder::new()
+    .set_footer_text("Thank you for your cooperation.")
+    .build();
+
+let invoice = InvoiceRRBuilder::new()
+    .set_header(Header::default())
+    .set_subject1(subject1)
+    .set_subject2(subject2)
+    .set_currency("PLN")
+    .set_issue_date(NaiveDate::from_ymd_opt(2023, 10, 25).unwrap())
+    .set_invoice_number("RR/2023/10/001")
+    .set_net_value(Decimal::from_str("1000.00").unwrap())
+    .set_tax_value(Decimal::from_str("65.00").unwrap())
+    .set_total_value(Decimal::from_str("1065.00").unwrap())
+    .set_total_value_pln(Decimal::from_str("1065.00").unwrap())
+    .set_total_value_words("one thousand sixty-five zlotys 00/100")
+    .set_invoice_type(invoice_gen::fa_rr::models::InvoiceType::VatRr)
+    .set_footer(footer)
+    .build();
+
+let xml = invoice.to_xml().unwrap();
+println!("{}", xml);
+```
+
+#### InvoiceRRBuilder (FA_RR)
+
+- `new()` – create a new RR invoice builder
+- `set_header(self, header: Header)` – set the header
+- `set_subject1(self, subject1: Subject1)` – set farmer data
+- `set_subject2(self, subject2: Subject2)` – set buyer data
+- `set_currency(self, code: &str)` – currency code (e.g. "PLN")
+- `set_issue_date(self, date: NaiveDate)` – issue date
+- `set_invoice_number(self, number: &str)` – invoice number
+- `set_net_value(self, value: Decimal)` – net value
+- `set_tax_value(self, value: Decimal)` – VAT value
+- `set_total_value(self, value: Decimal)` – gross value
+- `set_total_value_pln(self, value: Decimal)` – gross value in PLN (field P_12_1W)
+- `set_total_value_words(self, value: &str)` – value in words (field P_12_2)
+- `set_invoice_type(self, typ: InvoiceType)` – invoice type (VatRr or KorVatRr)
+- `set_footer(self, footer: Footer)` – footer (supports Stopka→Informacje→StopkaFaktury structure)
+- `build(self)` – build the invoice
 
 ---
 
