@@ -87,6 +87,7 @@ impl Invoice {
         let mut net_13_6_1 = Decimal::ZERO; // 0 domestic
         let mut net_13_6_2 = Decimal::ZERO; // 0 intra
         let mut net_13_6_3 = Decimal::ZERO; // 0 export
+        let mut net_13_8 = Decimal::ZERO; // oo
 
         // Ensure invoice lines have sequential positive line numbers required by TNaturalny (MinExclusive > 0)
         for (idx, line) in inv.invoice_body.lines.iter_mut().enumerate() {
@@ -143,7 +144,10 @@ impl Invoice {
                         TaxRate::ZeroEX => {
                             net_13_6_3 += net;
                         }
-                        TaxRate::Zw | TaxRate::Oo | TaxRate::NpI | TaxRate::NpII => {
+                        TaxRate::Oo => {
+                            net_13_8 += net;
+                        }
+                        TaxRate::Zw | TaxRate::NpI | TaxRate::NpII => {
                             net_13_1 += net;
                             tax_14_1 += vat;
                         }
@@ -232,6 +236,11 @@ impl Invoice {
             None
         };
 
+        inv.invoice_body.net_total_oo = if net_13_8 != Decimal::ZERO {
+            Some(net_13_8.round_dp(2))
+        } else {
+            None
+        };
         inv.invoice_body.total_amount = total.round_dp(2);
 
         if inv.invoice_body.invoice_type.is_none() {
@@ -557,6 +566,9 @@ pub struct InvoiceBody {
     #[serde(rename = "P_13_6_3")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub net_total_0_export: Option<Decimal>,
+    #[serde(rename = "P_13_8")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub net_total_oo: Option<Decimal>,
     #[serde(rename = "P_15")]
     pub total_amount: Decimal,
     #[serde(rename = "Adnotacje")]
@@ -608,6 +620,7 @@ impl Default for InvoiceBody {
             net_total_0_domestic: None,
             net_total_0_intra: None,
             net_total_0_export: None,
+            net_total_oo: None,
             total_amount: Decimal::ZERO,
             invoice_type: None,
             annotations: Annotations::default(),
