@@ -4,6 +4,7 @@ use crate::shared::models::{
 };
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
+use rust_decimal::RoundingStrategy;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
@@ -101,7 +102,7 @@ impl Invoice {
 
                 let vat = if let Some(rate) = &line.tax_rate {
                     let net_cents = (net * Decimal::new(100, 0))
-                        .round_dp(0)
+                        .round_dp_with_strategy(0, rust_decimal::RoundingStrategy::MidpointAwayFromZero)
                         .to_i128()
                         .unwrap_or(0);
                     let vat_cents = (net_cents * rate.basis_points() as i128) / 10000;
@@ -166,82 +167,82 @@ impl Invoice {
         }
 
         inv.invoice_body.net_total_basic_rate = if net_13_1 != Decimal::ZERO {
-            Some(net_13_1.round_dp(2))
+            Some(net_13_1.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
         inv.invoice_body.tax_total_basic_rate = if tax_14_1 != Decimal::ZERO {
-            Some(tax_14_1.round_dp(2))
+            Some(tax_14_1.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
 
         inv.invoice_body.net_total_reduced_rate_1 = if net_13_2 != Decimal::ZERO {
-            Some(net_13_2.round_dp(2))
+            Some(net_13_2.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
         inv.invoice_body.tax_total_reduced_rate_1 = if tax_14_2 != Decimal::ZERO {
-            Some(tax_14_2.round_dp(2))
+            Some(tax_14_2.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
 
         inv.invoice_body.net_total_reduced_rate_2 = if net_13_3 != Decimal::ZERO {
-            Some(net_13_3.round_dp(2))
+            Some(net_13_3.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
         inv.invoice_body.tax_total_reduced_rate_2 = if tax_14_3 != Decimal::ZERO {
-            Some(tax_14_3.round_dp(2))
+            Some(tax_14_3.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
 
         inv.invoice_body.net_total_taxi = if net_13_4 != Decimal::ZERO {
-            Some(net_13_4.round_dp(2))
+            Some(net_13_4.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
         inv.invoice_body.tax_total_taxi = if tax_14_4 != Decimal::ZERO {
-            Some(tax_14_4.round_dp(2))
+            Some(tax_14_4.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
 
         inv.invoice_body.net_total_special = if net_13_5 != Decimal::ZERO {
-            Some(net_13_5.round_dp(2))
+            Some(net_13_5.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
         inv.invoice_body.tax_total_special = if tax_14_5 != Decimal::ZERO {
-            Some(tax_14_5.round_dp(2))
+            Some(tax_14_5.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
 
         inv.invoice_body.net_total_0_domestic = if net_13_6_1 != Decimal::ZERO {
-            Some(net_13_6_1.round_dp(2))
+            Some(net_13_6_1.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
         inv.invoice_body.net_total_0_intra = if net_13_6_2 != Decimal::ZERO {
-            Some(net_13_6_2.round_dp(2))
+            Some(net_13_6_2.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
         inv.invoice_body.net_total_0_export = if net_13_6_3 != Decimal::ZERO {
-            Some(net_13_6_3.round_dp(2))
+            Some(net_13_6_3.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
 
         inv.invoice_body.net_total_oo = if net_13_8 != Decimal::ZERO {
-            Some(net_13_8.round_dp(2))
+            Some(net_13_8.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero))
         } else {
             None
         };
-        inv.invoice_body.total_amount = total.round_dp(2);
+        inv.invoice_body.total_amount = total.round_dp_with_strategy(2, rust_decimal::RoundingStrategy::MidpointAwayFromZero);
 
         if inv.invoice_body.invoice_type.is_none() {
             inv.invoice_body.invoice_type = Some("VAT".to_string());
