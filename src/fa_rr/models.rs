@@ -1,7 +1,7 @@
+use crate::shared::models::{Address, ContactData, CurrencyCode, IdentificationData};
+use chrono::Local;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use chrono::Local;
-use crate::shared::models::{Address, ContactData, CurrencyCode, IdentificationData};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename = "Faktura")]

@@ -1,7 +1,7 @@
-use super::models::{InvoiceRR, Header, Subject1, Subject2, Footer};
-use rust_decimal::Decimal;
-use chrono::NaiveDate;
+use super::models::{Footer, Header, InvoiceRR, Subject1, Subject2};
 use crate::shared::models::{Address, ContactData, CurrencyCode, IdentificationData};
+use chrono::NaiveDate;
+use rust_decimal::Decimal;
 
 pub struct InvoiceRRBuilder {
     invoice: InvoiceRR,
@@ -123,7 +123,9 @@ impl Subject1Builder {
 
     pub fn build(self) -> Subject1 {
         Subject1 {
-            identification_data: self.identification_data.expect("IdentificationData is required for Subject1"),
+            identification_data: self
+                .identification_data
+                .expect("IdentificationData is required for Subject1"),
             address: self.address.expect("Address is required for Subject1"),
             correspondence_address: self.correspondence_address,
             contact_data: self.contact_data,
@@ -165,7 +167,9 @@ impl Subject2Builder {
 
     pub fn build(self) -> Subject2 {
         Subject2 {
-            identification_data: self.identification_data.expect("IdentificationData is required for Subject2"),
+            identification_data: self
+                .identification_data
+                .expect("IdentificationData is required for Subject2"),
             address: self.address.expect("Address is required for Subject2"),
             correspondence_address: self.correspondence_address,
             contact_data: self.contact_data,
@@ -212,10 +216,13 @@ impl AddressBuilder {
 
     pub fn build(self) -> Address {
         Address {
-            country_code: self.country_code
+            country_code: self
+                .country_code
                 .map(crate::shared::models::CountryCode::new)
                 .expect("Country code is required for Address"),
-            address_line_1: self.address_line_1.expect("Address line 1 is required for Address"),
+            address_line_1: self
+                .address_line_1
+                .expect("Address line 1 is required for Address"),
             address_line_2: self.address_line_2,
             gln: self.gln,
         }
@@ -239,7 +246,11 @@ impl FooterBuilder {
     pub fn build(self) -> Footer {
         use super::models::{Footer, FooterInfo};
         Footer {
-            informacje: self.footer_text.map(|txt| vec![FooterInfo { footer_text: Some(txt) }]),
+            informacje: self.footer_text.map(|txt| {
+                vec![FooterInfo {
+                    footer_text: Some(txt),
+                }]
+            }),
         }
     }
 }

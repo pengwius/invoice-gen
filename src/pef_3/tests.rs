@@ -50,7 +50,11 @@ fn test_party_parsing() {
     let wrapper: Result<Wrapper, _> = quick_xml::de::from_str(xml);
     match wrapper {
         Ok(_p) => (),
-        Err(e) => panic!("Failed to parse party: {:?}, source: {:?}", e, std::error::Error::source(&e)),
+        Err(e) => panic!(
+            "Failed to parse party: {:?}, source: {:?}",
+            e,
+            std::error::Error::source(&e)
+        ),
     }
 }
 
@@ -174,9 +178,7 @@ fn test_generate_complex_invoice() {
         .add_subtotal("1000.00", "230.00", "PLN", "S", "23", "VAT")
         .build();
 
-    let tax_total_eur = TaxTotalBuilder::new()
-        .tax_amount("EUR", "53.49")
-        .build();
+    let tax_total_eur = TaxTotalBuilder::new().tax_amount("EUR", "53.49").build();
 
     let invoice = InvoiceBuilder::new(
         "COMPLEX-002",

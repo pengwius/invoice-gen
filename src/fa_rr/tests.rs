@@ -36,33 +36,33 @@ fn pretty_print_xml(xml: &str) -> Result<String, Box<dyn Error>> {
 
 #[test]
 fn test_generate_invoice_rr_basic() {
-    use super::builder::{Subject1Builder, Subject2Builder, AddressBuilder, FooterBuilder};
+    use super::builder::{AddressBuilder, FooterBuilder, Subject1Builder, Subject2Builder};
     use crate::shared::models::IdentificationData;
 
     let subject1 = Subject1Builder::new(IdentificationData {
-            nip: "5261234567".to_string(),
-            name: "Rolnik Jan Kowalski".to_string(),
-        })
-        .set_address(
-            AddressBuilder::new()
-                .set_country_code("PL")
-                .set_address_line_1("Wiejska 1")
-                .set_line2("Gospodarstwo 2")
-                .build(),
-        )
-        .build();
+        nip: "5261234567".to_string(),
+        name: "Rolnik Jan Kowalski".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Wiejska 1")
+            .set_line2("Gospodarstwo 2")
+            .build(),
+    )
+    .build();
 
     let subject2 = Subject2Builder::new(IdentificationData {
-            nip: "9876543210".to_string(),
-            name: "Firma Skupująca Sp. z o.o.".to_string(),
-        })
-        .set_address(
-            AddressBuilder::new()
-                .set_country_code("PL")
-                .set_address_line_1("Przemysłowa 5")
-                .build(),
-        )
-        .build();
+        nip: "9876543210".to_string(),
+        name: "Firma Skupująca Sp. z o.o.".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Przemysłowa 5")
+            .build(),
+    )
+    .build();
 
     let footer = FooterBuilder::new()
         .set_footer_text("Dziękujemy za współpracę.")
@@ -88,9 +88,18 @@ fn test_generate_invoice_rr_basic() {
     assert_eq!(invoice.invoice_body.currency_code, CurrencyCode::new("PLN"));
     assert_eq!(invoice.invoice_body.issue_date, "2023-10-25");
     assert_eq!(invoice.invoice_body.invoice_number, "RR/2023/10/001");
-    assert_eq!(invoice.invoice_body.net_value, Decimal::from_str("1000.00").unwrap());
-    assert_eq!(invoice.invoice_body.tax_value, Decimal::from_str("65.00").unwrap());
-    assert_eq!(invoice.invoice_body.total_value, Decimal::from_str("1065.00").unwrap());
+    assert_eq!(
+        invoice.invoice_body.net_value,
+        Decimal::from_str("1000.00").unwrap()
+    );
+    assert_eq!(
+        invoice.invoice_body.tax_value,
+        Decimal::from_str("65.00").unwrap()
+    );
+    assert_eq!(
+        invoice.invoice_body.total_value,
+        Decimal::from_str("1065.00").unwrap()
+    );
 
     let xml_result = invoice.to_xml();
     assert!(xml_result.is_ok(), "XML generation failed");
@@ -114,39 +123,39 @@ fn test_generate_invoice_rr_basic() {
 
 #[test]
 fn test_generate_invoice_rr_with_correspondence_address() {
-    use super::builder::{Subject1Builder, Subject2Builder, AddressBuilder};
+    use super::builder::{AddressBuilder, Subject1Builder, Subject2Builder};
     use crate::shared::models::IdentificationData;
 
     let subject1 = Subject1Builder::new(IdentificationData {
-            nip: "5261234567".to_string(),
-            name: "Rolnik Jan Kowalski".to_string(),
-        })
-        .set_address(
-            AddressBuilder::new()
-                .set_country_code("PL")
-                .set_address_line_1("Wiejska 1")
-                .set_line2("Gospodarstwo 2")
-                .build(),
-        )
-        .set_correspondence_address(
-            AddressBuilder::new()
-                .set_country_code("PL")
-                .set_address_line_1("Pocztowa 3")
-                .build(),
-        )
-        .build();
+        nip: "5261234567".to_string(),
+        name: "Rolnik Jan Kowalski".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Wiejska 1")
+            .set_line2("Gospodarstwo 2")
+            .build(),
+    )
+    .set_correspondence_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Pocztowa 3")
+            .build(),
+    )
+    .build();
 
     let subject2 = Subject2Builder::new(IdentificationData {
-            nip: "9876543210".to_string(),
-            name: "Firma Skupująca Sp. z o.o.".to_string(),
-        })
-        .set_address(
-            AddressBuilder::new()
-                .set_country_code("PL")
-                .set_address_line_1("Przemysłowa 5")
-                .build(),
-        )
-        .build();
+        nip: "9876543210".to_string(),
+        name: "Firma Skupująca Sp. z o.o.".to_string(),
+    })
+    .set_address(
+        AddressBuilder::new()
+            .set_country_code("PL")
+            .set_address_line_1("Przemysłowa 5")
+            .build(),
+    )
+    .build();
 
     let builder = InvoiceRRBuilder::new()
         .set_subject1(subject1)
@@ -166,9 +175,18 @@ fn test_generate_invoice_rr_with_correspondence_address() {
     assert_eq!(invoice.invoice_body.currency_code, CurrencyCode::new("EUR"));
     assert_eq!(invoice.invoice_body.issue_date, "2023-11-01");
     assert_eq!(invoice.invoice_body.invoice_number, "RR/2023/11/002");
-    assert_eq!(invoice.invoice_body.net_value, Decimal::from_str("2000.00").unwrap());
-    assert_eq!(invoice.invoice_body.tax_value, Decimal::from_str("130.00").unwrap());
-    assert_eq!(invoice.invoice_body.total_value, Decimal::from_str("2130.00").unwrap());
+    assert_eq!(
+        invoice.invoice_body.net_value,
+        Decimal::from_str("2000.00").unwrap()
+    );
+    assert_eq!(
+        invoice.invoice_body.tax_value,
+        Decimal::from_str("130.00").unwrap()
+    );
+    assert_eq!(
+        invoice.invoice_body.total_value,
+        Decimal::from_str("2130.00").unwrap()
+    );
 
     let xml_result = invoice.to_xml();
     assert!(xml_result.is_ok(), "XML generation failed");
@@ -187,4 +205,4 @@ fn test_generate_invoice_rr_with_correspondence_address() {
     assert!(xml.contains("<P_11_2>130.00</P_11_2>"));
     assert!(xml.contains("<P_12_1>2130.00</P_12_1>"));
     assert!(xml.contains("kodSystemowy=\"FA_RR (1)\""));
- }
+}
