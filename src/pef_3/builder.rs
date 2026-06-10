@@ -99,8 +99,12 @@ impl InvoiceBuilder {
                 additional_document_reference: None,
                 project_reference: None,
                 signature: None,
-                accounting_supplier_party: Some(PartyWrapper { party: accounting_supplier_party }),
-            accounting_customer_party: Some(PartyWrapper { party: accounting_customer_party }),
+                accounting_supplier_party: Some(PartyWrapper {
+                    party: accounting_supplier_party,
+                }),
+                accounting_customer_party: Some(PartyWrapper {
+                    party: accounting_customer_party,
+                }),
                 payee_party: None,
                 buyer_customer_party: None,
                 seller_supplier_party: None,
@@ -138,11 +142,27 @@ impl InvoiceBuilder {
     builder_setter!(due_date, due_date, impl Into<String>);
     builder_setter!(invoice_type_code, invoice_type_code, impl Into<Code>);
     builder_setter!(tax_point_date, tax_point_date, impl Into<String>);
-    builder_setter!(document_currency_code, document_currency_code, impl Into<Code>);
+    builder_setter!(
+        document_currency_code,
+        document_currency_code,
+        impl Into<Code>
+    );
     builder_setter!(tax_currency_code, tax_currency_code, impl Into<Code>);
-    builder_setter!(pricing_currency_code, pricing_currency_code, impl Into<Code>);
-    builder_setter!(payment_currency_code, payment_currency_code, impl Into<Code>);
-    builder_setter!(payment_alternative_currency_code, payment_alternative_currency_code, impl Into<Code>);
+    builder_setter!(
+        pricing_currency_code,
+        pricing_currency_code,
+        impl Into<Code>
+    );
+    builder_setter!(
+        payment_currency_code,
+        payment_currency_code,
+        impl Into<Code>
+    );
+    builder_setter!(
+        payment_alternative_currency_code,
+        payment_alternative_currency_code,
+        impl Into<Code>
+    );
     builder_setter!(
         accounting_cost_code,
         accounting_cost_code,

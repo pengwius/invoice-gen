@@ -240,13 +240,9 @@ fn test_br_07_buyer_legal_name_exists() {
 fn test_br_53_vat_accounting_currency_total() {
     let builder = create_common_invoice_builder();
 
-    let tax_total_pln = TaxTotalBuilder::new()
-        .tax_amount("PLN", "23.00")
-        .build();
+    let tax_total_pln = TaxTotalBuilder::new().tax_amount("PLN", "23.00").build();
 
-    let tax_total_eur = TaxTotalBuilder::new()
-        .tax_amount("EUR", "5.35")
-        .build();
+    let tax_total_eur = TaxTotalBuilder::new().tax_amount("EUR", "5.35").build();
 
     let invoice = builder
         .document_currency_code("PLN")
